@@ -12,7 +12,7 @@ Application Symfony 7.3 de gestion de joueurs multi-sports, avec système d'avis
 - [Comptes de test](#comptes-de-test)
 - [Fonctionnalités](#fonctionnalités)
 - [Sécurité & Rôles](#sécurité--rôles)
-- [TODO / Améliorations](#todo--améliorations)
+- [Utilisation rapide](#utilisation-rapide)
 
 ## Technologies
 - PHP 8.2+
@@ -139,30 +139,13 @@ Relations clés :
 - Review -> User (ManyToOne)
 - Review -> Player (ManyToOne)
 
-## TODO / Améliorations
-Déjà fait (comparé à version initiale) :
-- [x] Bootstrap intégré
-- [x] Pagination joueurs
-- [x] Filtres multi-critères
-- [x] Optimisation moyenne (DQL agrégée)
-- [x] Dashboard admin enrichi
-- [x] Unicité avis (double barrière Doctrine + DB)
-
-À venir :
-- [ ] Suppression/cleanup du fichier photo lors de la suppression d'un joueur
-- [ ] Ajout tri (nom, moyenne, plus récent) côté liste joueurs
-- [ ] Amélioration performance : requête unique (players + moyenne) pour retirer la requête supplémentaire
-- [ ] Plus de tests fonctionnels (soumission avis, pagination filtrée)
-- [ ] Internationalisation (i18n)
-- [ ] Thème sombre / bascule UI
-- [ ] Export CSV des joueurs filtrés
-- [ ] Gestion avatar utilisateur
-- [ ] Suppression / édition d'un avis par l'utilisateur
-
-Idées bonus :
-- [ ] Notation visuelle (étoiles) via JavaScript léger
-- [ ] API JSON read-only (players + stats) pour intégration externe
-- [ ] Mise en cache des moyennes globales (cache.app)
+## Utilisation rapide
+1. Accéder à `/` : liste paginée + filtres.
+2. Cliquer sur un joueur : page détail + avis.
+3. Se connecter (compte user) pour ajouter un avis (1 seul par joueur).
+4. Consulter "Mes avis" via la navigation.
+5. Se connecter en admin et visiter `/admin/dashboard` pour les statistiques.
+6. Gérer catégories, niveaux et joueurs via le menu Admin.
 
 ## Exemples d'URL utiles
 ```
@@ -190,13 +173,7 @@ Les tests couvrent :
 4. Vider cache : `php bin/console cache:clear --env=prod`.
 
 ## Contribution interne
-Workflow recommandé :
-```
-git checkout -b feature/ma-fonctionnalite
-git commit -m "feat: description" 
-git push origin feature/ma-fonctionnalite
-```
-Puis créer une Pull Request.
+Projet figé (version finale). Pour correctif éventuel : créer une branche courte puis merger.
 
 ## Licence
 Projet pédagogique interne (non publié sous licence open source formelle pour le moment).
