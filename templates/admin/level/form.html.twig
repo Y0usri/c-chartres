@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+{% block title 'Niveau' %}
+{% block body %}
+<h1>Niveau</h1>
+{{ form_start(form) }}
+{{ form_widget(form) }}
+<button>Enregistrer</button>
+{{ form_end(form) }}
+<p><a href="{{ path('admin_level_index') }}">Retour</a></p>
+{% endblock %}

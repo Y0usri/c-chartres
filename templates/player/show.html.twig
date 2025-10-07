@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+{% block title player.firstName ~ ' ' ~ player.lastName %}
+{% block page_header %}<a class="btn btn-link p-0 small" href="{{ path('app_home') }}">← Retour</a><h1 class="h3 fw-bold mt-2">{{ player.firstName }} {{ player.lastName }}</h1>{% endblock %}
+{% block body %}
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="ratio ratio-4x3 bg-light d-flex align-items-center justify-content-center text-muted">Photo</div>
+            <div class="card-body">
+                <p class="mb-1"><span class="text-muted">Catégorie:</span> {{ player.category.name }}</p>
+                <p class="mb-1"><span class="text-muted">Niveau:</span> {{ player.level.name }}</p>
+                <p class="mb-1"><span class="text-muted">Naissance:</span> {{ player.birthDate|date('Y-m-d') }}</p>
+                <p class="mb-0"><span class="text-muted">Moyenne:</span> <span class="badge bg-primary">{{ average|number_format(2, '.', ' ') }}</span></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <h2 class="h5">Avis</h2>
+        {% set notes = reviews is defined ? reviews : player.reviews %}
+        {% if notes|length > 0 %}
+            <div class="list-group mb-3">
+                {% for r in notes %}
+                    <div class="list-group-item list-group-item-action">
+                        <div class="d-flex justify-content-between">
+                            <strong>{{ r.rating }}/5</strong>
+                            <small class="text-muted">{{ r.createdAt|date('Y-m-d') }}</small>
+                        </div>
+                        <div class="mt-1">{{ r.comment }}</div>
+                        <div class="small text-muted">par {{ r.user.firstName }} {{ r.user.lastName }}</div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-secondary">Aucun avis pour ce joueur.</div>
+        {% endif %}
+        {% if has_review %}
+            <div class="alert alert-info">Vous avez déjà laissé un avis.</div>
+        {% elseif review_form is defined and review_form %}
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h3 class="h6">Ajouter un avis</h3>
+                    {% if not review_form.vars.valid %}
+                        <div class="alert alert-danger py-2 mb-2">{{ form_errors(review_form) }}</div>
+                    {% endif %}
+                    {{ form_start(review_form) }}
+                    <div class="row g-3">
+                        <div class="col-4">{{ form_row(review_form.rating) }}</div>
+                        <div class="col-12">{{ form_row(review_form.comment) }}</div>
+                    </div>
+                    <div class="mt-2"><button class="btn btn-primary btn-sm">Envoyer</button></div>
+                    {{ form_end(review_form) }}
+                </div>
+            </div>
+        {% else %}
+            <p><a href="{{ path('app_login') }}">Connectez-vous</a> pour ajouter un avis.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

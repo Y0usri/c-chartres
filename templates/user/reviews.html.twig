@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+{% block title 'Mes avis' %}
+{% block page_header %}<h1 class="h3 fw-bold">Mes avis</h1>{% endblock %}
+{% block body %}
+{% if reviews|length > 0 %}
+  <div class="list-group shadow-sm">
+    {% for r in reviews|sort((a,b)=> b.createdAt <=> a.createdAt) %}
+      <div class="list-group-item list-group-item-action">
+        <div class="d-flex w-100 justify-content-between align-items-start">
+          <div class="me-3">
+            <a class="fw-semibold text-decoration-none" href="{{ path('app_player_show',{id:r.player.id}) }}">{{ r.player.firstName }} {{ r.player.lastName }}</a>
+            <div class="small text-muted">{{ r.createdAt|date('Y-m-d') }}</div>
+          </div>
+          <span class="badge bg-primary rounded-pill align-self-start">{{ r.rating }}/5</span>
+        </div>
+        <p class="mb-1 mt-2">{{ r.comment }}</p>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="alert alert-info">Vous n'avez pas encore laissé d'avis.</div>
+  <a class="btn btn-outline-primary" href="{{ path('app_home') }}">Voir les joueurs</a>
+{% endif %}
+{% endblock %}

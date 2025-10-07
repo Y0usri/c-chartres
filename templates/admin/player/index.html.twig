@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+{% block title 'Joueurs' %}
+{% block body %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h4 m-0">Joueurs</h1>
+    <a class="btn btn-primary btn-sm" href="{{ path('admin_player_new') }}">Nouveau</a>
+</div>
+<div class="table-responsive shadow-sm">
+<table class="table table-hover align-middle mb-0">
+    <thead class="table-light"><tr><th>ID</th><th>Nom</th><th>Catégorie</th><th>Niveau</th><th>Photo</th><th></th></tr></thead>
+    <tbody>
+        {% for p in players %}
+            <tr>
+                <td class="text-muted">{{ p.id }}</td>
+                <td>{{ p.firstName }} {{ p.lastName }}</td>
+                <td><span class="badge bg-secondary">{{ p.category.name }}</span></td>
+                <td><span class="badge bg-info text-dark">{{ p.level.name }}</span></td>
+                <td>{% if p.photoFilename %}<img src="/uploads/players/{{ p.photoFilename }}" alt="" width="50" class="rounded">{% else %}<span class="text-muted small">—</span>{% endif %}</td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-secondary" href="{{ path('admin_player_edit',{id:p.id}) }}">Modifier</a>
+                    <form method="post" action="{{ path('admin_player_delete',{id:p.id}) }}" class="d-inline" onsubmit="return confirm('Supprimer ce joueur ?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('del_player_'~p.id) }}">
+                        <button class="btn btn-sm btn-outline-danger">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}

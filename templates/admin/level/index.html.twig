@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+{% block title 'Niveaux' %}
+{% block body %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h4 m-0">Niveaux</h1>
+    <a class="btn btn-primary btn-sm" href="{{ path('admin_level_new') }}">Nouveau</a>
+</div>
+<div class="table-responsive shadow-sm">
+<table class="table table-striped align-middle mb-0">
+    <thead class="table-light"><tr><th>ID</th><th>Nom</th><th></th></tr></thead>
+    <tbody>
+        {% for l in levels %}
+            <tr>
+                <td class="text-muted">{{ l.id }}</td>
+                <td>{{ l.name }}</td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-secondary" href="{{ path('admin_level_edit',{id:l.id}) }}">Modifier</a>
+                    <form method="post" action="{{ path('admin_level_delete',{id:l.id}) }}" class="d-inline" onsubmit="return confirm('Supprimer ce niveau ?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('del_lvl_'~l.id) }}">
+                        <button class="btn btn-sm btn-outline-danger">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}

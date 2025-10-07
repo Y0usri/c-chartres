@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+{% block title 'Joueur' %}
+{% block body %}
+<h1>Joueur</h1>
+{{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+{{ form_row(form.firstName) }}
+{{ form_row(form.lastName) }}
+{{ form_row(form.birthDate) }}
+{{ form_row(form.category) }}
+{{ form_row(form.level) }}
+{{ form_row(form.photoFile) }}
+<button>Enregistrer</button>
+{{ form_end(form) }}
+<p><a href="{{ path('admin_player_index') }}">Retour</a></p>
+{% endblock %}

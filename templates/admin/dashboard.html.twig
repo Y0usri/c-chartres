@@ -1,0 +1,94 @@
+{% extends 'base.html.twig' %}
+{% block title 'Administration' %}
+{% block page_header %}<h1 class="h3 fw-bold">Administration</h1>{% endblock %}
+{% block body %}
+<div class="row g-4 mb-4">
+  <div class="col-6 col-md-4 col-xl-2">
+    <div class="card stat-tile shadow-sm border-0">
+      <div class="card-body text-center">
+        <div class="h4 mb-0">{{ stats.counts.players }}</div>
+        <div class="text-muted small">Joueurs</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4 col-xl-2">
+    <div class="card stat-tile shadow-sm border-0">
+      <div class="card-body text-center">
+        <div class="h4 mb-0">{{ stats.counts.reviews }}</div>
+        <div class="text-muted small">Avis</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4 col-xl-2">
+    <div class="card stat-tile shadow-sm border-0">
+      <div class="card-body text-center">
+        <div class="h4 mb-0">{{ stats.counts.categories }}</div>
+        <div class="text-muted small">Catégories</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4 col-xl-2">
+    <div class="card stat-tile shadow-sm border-0">
+      <div class="card-body text-center">
+        <div class="h4 mb-0">{{ stats.counts.levels }}</div>
+        <div class="text-muted small">Niveaux</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4 col-xl-2">
+    <div class="card stat-tile shadow-sm border-0">
+      <div class="card-body text-center">
+        <div class="h4 mb-0">{{ stats.counts.users }}</div>
+        <div class="text-muted small">Utilisateurs</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4 col-xl-2">
+    <div class="card stat-tile shadow-sm border-0">
+      <div class="card-body text-center">
+        <div class="h4 mb-0">{{ stats.avgGlobal|number_format(2,'.',' ') }}</div>
+        <div class="text-muted small">Moy. globale</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-header bg-white fw-semibold">Accès rapides</div>
+      <div class="list-group list-group-flush">
+        <a class="list-group-item list-group-item-action" href="{{ path('admin_player_new') }}">➕ Nouveau joueur</a>
+        <a class="list-group-item list-group-item-action" href="{{ path('admin_category_new') }}">➕ Nouvelle catégorie</a>
+        <a class="list-group-item list-group-item-action" href="{{ path('admin_level_new') }}">➕ Nouveau niveau</a>
+        <a class="list-group-item list-group-item-action" href="{{ path('admin_player_index') }}">📋 Liste joueurs</a>
+        <a class="list-group-item list-group-item-action" href="{{ path('admin_category_index') }}">📋 Liste catégories</a>
+        <a class="list-group-item list-group-item-action" href="{{ path('admin_level_index') }}">📋 Liste niveaux</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-header bg-white fw-semibold">Top joueurs (moyenne)</div>
+      <div class="table-responsive">
+        <table class="table table-sm mb-0 align-middle">
+          <thead><tr><th>Joueur</th><th class="text-end">Moy.</th><th class="text-end">Avis</th></tr></thead>
+          <tbody>
+          {% for p in topPlayers %}
+            {% if p.player %}
+            <tr>
+              <td><a class="text-decoration-none" href="{{ path('app_player_show',{id:p.player.id}) }}">{{ p.player.firstName }} {{ p.player.lastName }}</a></td>
+              <td class="text-end"><span class="badge bg-primary">{{ p.avg|number_format(2,'.',' ') }}</span></td>
+              <td class="text-end"><span class="text-muted small">{{ p.count }}</span></td>
+            </tr>
+            {% endif %}
+          {% else %}
+            <tr><td colspan="3" class="text-muted">Aucun joueur.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

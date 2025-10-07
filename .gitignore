@@ -1,0 +1,50 @@
+### Symfony / PHP ###
+/var/
+/vendor/
+/public/uploads/players/*
+!public/uploads/players/.gitignore
+/.env.local
+/.env.*.local
+/.phpunit.cache/
+/.idea/
+/.vscode/
+composer.lock
+phpunit.xml
+
+### Node / Front ###
+node_modules/
+/public/build/
+/assets/vendor/
+
+### Logs / OS ###
+*.log
+*.cache
+Thumbs.db
+.DS_Store
+
+### Coverage ###
+coverage/
+
+### Misc ###
+/.turbo
+/.symfony5
+/.env.local.php
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
+
+###> phpunit/phpunit ###
+/phpunit.xml
+/.phpunit.cache/
+###< phpunit/phpunit ###
+
+###> symfony/asset-mapper ###
+/public/assets/
+/assets/vendor/
+###< symfony/asset-mapper ###

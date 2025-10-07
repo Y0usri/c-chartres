@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+{% block title 'Catégorie' %}
+{% block body %}
+<h1>Catégorie</h1>
+{{ form_start(form) }}
+{{ form_widget(form) }}
+<button>Enregistrer</button>
+{{ form_end(form) }}
+<p><a href="{{ path('admin_category_index') }}">Retour</a></p>
+{% endblock %}
