@@ -1,10 +1,11 @@
 # Projet C-Chartres Web
 
-Application Symfony 7.3 de gestion de joueurs, catégories sportives, niveaux et avis utilisateurs.
+Application Symfony 7.3 de gestion de joueurs multi-sports, avec système d'avis, back-office administrateur, pagination, filtres dynamiques et calcul optimisé des moyennes.
 
 ## Sommaire
 - [Technologies](#technologies)
 - [Prérequis](#prérequis)
+- [Démarrage rapide](#démarrage-rapide)
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Commandes utiles](#commandes-utiles)
@@ -19,23 +20,48 @@ Application Symfony 7.3 de gestion de joueurs, catégories sportives, niveaux et
 - Doctrine ORM / Migrations
 - Twig
 - Symfony Security / Validation / Form
+- Bootstrap 5 (CDN)
+- Symfony UX Turbo (désactivé partiellement là où nécessaire)
+- PHPUnit (tests basiques)
 
 ## Prérequis
 - PHP 8.2+
 - Composer
 - Serveur MariaDB / MySQL
 
+## Démarrage rapide
+```bash
+git clone <repo>
+cd c-chartres-web
+cp .env.example .env.local
+composer install
+php bin/console doctrine:database:create
+php bin/console doctrine:migrations:migrate
+php bin/console doctrine:fixtures:load --no-interaction
+symfony serve -d   # ou php -S localhost:8000 -t public
+```
+Comptes de test : admin@example.com / admin123 et user@example.com / user123
+
 ## Installation
+Cloner ou récupérer le projet puis installer les dépendances :
 ```bash
 composer install
 ```
+Si vous utilisez l'exécutable Symfony :
+```bash
+symfony composer install
+```
 
 ## Configuration
-Créer un fichier `.env.local` :
+Copier le fichier d'exemple :
+```
+cp .env.example .env.local
+```
+Puis éditer les valeurs (DB, APP_SECRET). Exemple de `.env.local` :
 ```
 DATABASE_URL="mysql://USER:PASS@HOST:3306/cchartresweb?serverVersion=10.5.8-MariaDB&charset=utf8mb4"
 ```
-Créer la base puis :
+Créer la base puis exécuter migrations & fixtures :
 ```bash
 php bin/console doctrine:database:create
 php bin/console doctrine:migrations:migrate
@@ -43,11 +69,24 @@ php bin/console doctrine:fixtures:load --no-interaction
 ```
 
 ## Commandes utiles
+Lancer le serveur de dev :
 ```bash
-php -S localhost:8000 -t public
+symfony serve -d
 # ou
-symfony server:start
+php -S localhost:8000 -t public
 ```
+
+Lancer les tests :
+```bash
+php bin/phpunit
+```
+
+Forcer rechargement des fixtures (AJOUT sans purge) :
+```bash
+php bin/console doctrine:fixtures:load --append
+```
+
+ATTENTION: si vous avez besoin d'une réinitialisation propre avec contraintes FK, purgez manuellement dans l'ordre (`review` puis `player` etc.) ou utilisez un script SQL, car le `--purge-with-truncate` peut échouer (FK actives).
 
 ## Comptes de test
 | Rôle | Email | Mot de passe |
@@ -56,31 +95,111 @@ symfony server:start
 | User  | user@example.com  | user123  |
 
 ## Fonctionnalités
-- Liste des joueurs (page d'accueil)
-- Fiche joueur + avis + moyenne
-- Ajout d'avis (1 par joueur et par utilisateur)
-- CRUD Admin: Catégories / Niveaux / Joueurs (upload photo)
-- Espace "Mes avis" pour utilisateur connecté
-- Validation des données (entités + formulaires)
+Front / Public :
+- Page d'accueil listant les joueurs avec pagination (12 / page)
+- Filtres combinés : recherche (prénom/nom), catégorie, niveau, moyenne minimum
+- Calcul de la moyenne optimisé par requête d'agrégation (repository dédié)
+- Détails joueur avec liste des avis triés récents → anciens
+- Système d'avis (1 avis par joueur et par utilisateur, unicité contrôlée par contrainte DB + UniqueEntity)
+- Empêchement de doublon même en conditions de race (try/catch sur violation)
+
+Espace utilisateur :
+- Page "Mes avis" listant les avis de l'utilisateur connecté
+
+Back-office Admin :
+- Dashboard avec KPIs (joueurs, avis, catégories, niveaux, utilisateurs, moyenne globale)
+- Top joueurs (moyenne + nombre d'avis)
+- Accès rapides (création / listes)
+- CRUD Catégorie / Niveau / Joueur (upload image basique – nom de fichier stocké)
+
+Technique & Qualité :
+- Validation (Assert + UniqueEntity)
+- Sécurité (form_login, rôle ADMIN, filtrage /admin et /my)
+- Gestion CSRF (formulaires sensibles + avis)
+- Seed data (fixtures) incluant joueurs connus multi-sports
+- Tests (Repository, Validation Review, HomeController)
+- Styling via Bootstrap + custom CSS
 
 ## Sécurité & Rôles
-- ROLE_USER : accès ajout avis + espace personnel
-- ROLE_ADMIN : accès interface d'administration `/admin`
+- ROLE_USER : ajouter un avis, consulter "Mes avis"
+- ROLE_ADMIN : tout le back-office (`/admin/*`)
+- Contrôle d'accès défini dans `security.yaml`
 
-## Structure base (principales tables)
-- app_user (utilisateurs)
-- category
-- level
-- player
-- review (unique user_id + player_id)
+## Structure base (tables principales)
+- `app_user` (utilisateurs)
+- `category`
+- `level`
+- `player`
+- `review` (contrainte unique `(user_id, player_id)`)
+
+Relations clés :
+- Player -> Category (ManyToOne)
+- Player -> Level (ManyToOne)
+- Player -> Review (OneToMany)
+- Review -> User (ManyToOne)
+- Review -> Player (ManyToOne)
 
 ## TODO / Améliorations
-- Intégrer un framework CSS (Bootstrap / Tailwind)
-- Suppression du fichier image lors de la suppression du joueur
-- Pagination liste des joueurs
-- Calcul moyenne via requête agrégée (optimisation)
-- Tests automatisés (PHPUnit) pour services / contrôleurs
-- Internationalisation (i18n)
+Déjà fait (comparé à version initiale) :
+- [x] Bootstrap intégré
+- [x] Pagination joueurs
+- [x] Filtres multi-critères
+- [x] Optimisation moyenne (DQL agrégée)
+- [x] Dashboard admin enrichi
+- [x] Unicité avis (double barrière Doctrine + DB)
+
+À venir :
+- [ ] Suppression/cleanup du fichier photo lors de la suppression d'un joueur
+- [ ] Ajout tri (nom, moyenne, plus récent) côté liste joueurs
+- [ ] Amélioration performance : requête unique (players + moyenne) pour retirer la requête supplémentaire
+- [ ] Plus de tests fonctionnels (soumission avis, pagination filtrée)
+- [ ] Internationalisation (i18n)
+- [ ] Thème sombre / bascule UI
+- [ ] Export CSV des joueurs filtrés
+- [ ] Gestion avatar utilisateur
+- [ ] Suppression / édition d'un avis par l'utilisateur
+
+Idées bonus :
+- [ ] Notation visuelle (étoiles) via JavaScript léger
+- [ ] API JSON read-only (players + stats) pour intégration externe
+- [ ] Mise en cache des moyennes globales (cache.app)
+
+## Exemples d'URL utiles
+```
+/?page=2&category=1&level=3&minAvg=3&q=le
+/player/5
+/admin/player
+/admin/dashboard
+/my/reviews (-> user_reviews route)
+```
+
+## Tests
+Commande :
+```bash
+php bin/phpunit
+```
+Les tests couvrent :
+- Repository moyenne joueur
+- Validation d'une Review (note hors plage)
+- Accès page d'accueil (contrôleur)
+
+## Déploiement rapide (exemple minimal)
+1. Copier `.env` vers `.env.prod.local` et ajuster `APP_ENV=prod`.
+2. Lancer migrations : `php bin/console doctrine:migrations:migrate --no-interaction --env=prod`.
+3. Installer dépendances avec `--no-dev --optimize-autoloader`.
+4. Vider cache : `php bin/console cache:clear --env=prod`.
+
+## Contribution interne
+Workflow recommandé :
+```
+git checkout -b feature/ma-fonctionnalite
+git commit -m "feat: description" 
+git push origin feature/ma-fonctionnalite
+```
+Puis créer une Pull Request.
+
+## Licence
+Projet pédagogique interne (non publié sous licence open source formelle pour le moment).
 
 ---
 © 2025 C-Chartres Web
