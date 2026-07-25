@@ -38,6 +38,9 @@ class AdminDashboardService
      */
     public function getTopPlayers(int $limit = 5): array
     {
+        // Les alias "HIDDEN" servent uniquement au ORDER BY : Doctrine ne les
+        // hydrate jamais dans le resultat (chaque ligne reste une entite Player),
+        // d'ou le recalcul explicite de la moyenne et du nombre d'avis ci-dessous.
         $qb = $this->em->getRepository(Player::class)->createQueryBuilder('p')
             ->leftJoin('p.reviews', 'r')
             ->addSelect('COALESCE(AVG(r.rating),0) AS HIDDEN avgRating')
@@ -46,33 +49,13 @@ class AdminDashboardService
             ->orderBy('avgRating', 'DESC')
             ->addOrderBy('reviewCount', 'DESC')
             ->setMaxResults($limit);
-        $rows = $qb->getQuery()->getResult();
-        $result = [];
-        foreach ($rows as $row) {
-            if ($row instanceof Player) {
-                $result[] = [
-                    'player' => $row,
-                    'avg' => 0.0,
-                    'count' => 0,
-                ];
-            } else {
-                // Quand Doctrine retourne un array (selon version / hydration)
-                $result[] = [
-                    'player' => $row[0] ?? null,
-                    'avg' => (float)($row['avgRating'] ?? 0),
-                    'count' => (int)($row['reviewCount'] ?? 0),
-                ];
-            }
-        }
-        // Normalisation si on a eu des objets Player seulement
-        foreach ($result as &$r) {
-            if ($r['avg'] === 0.0 && $r['player'] instanceof Player) {
-                // recalcul rapide au besoin
-                $r['avg'] = $this->getAverageForPlayer($r['player']);
-                $r['count'] = $this->getReviewCountForPlayer($r['player']);
-            }
-        }
-        return $result;
+        $players = $qb->getQuery()->getResult();
+
+        return array_map(fn(Player $player) => [
+            'player' => $player,
+            'avg' => $this->getAverageForPlayer($player),
+            'count' => $this->getReviewCountForPlayer($player),
+        ], $players);
     }
 
     private function getAverageForPlayer(Player $player): float

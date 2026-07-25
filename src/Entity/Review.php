@@ -7,9 +7,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
-#[ORM\Table(name: 'review', uniqueConstraints: [
-    new ORM\UniqueConstraint(name: 'uniq_review_user_player', columns: ['user_id','player_id'])
-])]
+#[ORM\Table(name: 'review')]
+#[ORM\UniqueConstraint(name: 'uniq_review_user_player', columns: ['user_id','player_id'])]
 #[UniqueEntity(fields: ['user', 'player'], message: 'Vous avez déjà laissé un avis pour ce joueur.')]
 class Review
 {

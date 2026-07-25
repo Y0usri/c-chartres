@@ -144,7 +144,7 @@ Relations clés :
 2. Cliquer sur un joueur : page détail + avis.
 3. Se connecter (compte user) pour ajouter un avis (1 seul par joueur).
 4. Consulter "Mes avis" via la navigation.
-5. Se connecter en admin et visiter `/admin/dashboard` pour les statistiques.
+5. Se connecter en admin et visiter `/admin` pour les statistiques.
 6. Gérer catégories, niveaux et joueurs via le menu Admin.
 
 ## Exemples d'URL utiles
@@ -152,7 +152,7 @@ Relations clés :
 /?page=2&category=1&level=3&minAvg=3&q=le
 /player/5
 /admin/player
-/admin/dashboard
+/admin
 /my/reviews (-> user_reviews route)
 ```
 

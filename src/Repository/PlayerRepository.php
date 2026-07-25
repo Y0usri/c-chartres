@@ -80,15 +80,24 @@ class PlayerRepository extends ServiceEntityRepository
             // On garde un select caché si besoin d'ordonner plus tard
             $qb->addSelect('COALESCE(AVG(r_avg.rating),0) AS HIDDEN avgFilter');
             $qb->groupBy('p.id');
-            // Utiliser directement l'expression dans HAVING (l'alias HIDDEN n'est pas disponible ici)
-            $qb->having('COALESCE(AVG(r_avg.rating),0) >= :minAvg')->setParameter('minAvg', (float)$minAvg);
+            // Valeur injectee litteralement (deja force-castee en float juste au-dessus,
+            // donc aucun risque d'injection) plutot que liee via un parametre : Doctrine/PDO
+            // lie les floats comme des chaines, et SQLite considere tout texte comme
+            // "superieur" a n'importe quel nombre, donc le HAVING via parametre lie
+            // rejetait silencieusement tous les joueurs.
+            $qb->having('COALESCE(AVG(r_avg.rating),0) >= ' . (float)$minAvg);
         }
 
         // Clone pour total (sans pagination)
         $countQb = clone $qb;
         if ($minAvg !== null && $minAvg !== '') {
-            $countQb->select('COUNT(DISTINCT p.id)');
-            $total = (int)$countQb->getQuery()->getSingleScalarResult();
+            // La requête de base a un GROUP BY + HAVING : elle retourne une ligne
+            // par joueur correspondant, pas une seule ligne agrégée. getSingleScalarResult()
+            // plante (NoResultException / NonUniqueResultException) sauf si exactement
+            // un joueur correspond. On compte donc les lignes du résultat au lieu
+            // d'agréger avec COUNT().
+            $countQb->select('p.id');
+            $total = count($countQb->getQuery()->getArrayResult());
         } else {
             $countQb->select('COUNT(p.id)');
             $total = (int)$countQb->getQuery()->getSingleScalarResult();
